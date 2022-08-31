@@ -19,12 +19,17 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\Middleware;
 
+use Doctrine\DBAL\DriverManager;
+use Fisharebest\Webtrees\DB\Connection;
+use Fisharebest\Webtrees\DB\WebtreesSchema;
 use Fisharebest\Webtrees\Services\MigrationService;
 use Fisharebest\Webtrees\Webtrees;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+
+use function parse_ini_file;
 
 /**
  * Middleware to update the database automatically, after an upgrade.
@@ -52,7 +57,21 @@ class UpdateDatabaseSchema implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->migration_service
-            ->updateSchema('\Fisharebest\Webtrees\Schema', 'WT_SCHEMA_VERSION', Webtrees::SCHEMA_VERSION);
+            ->updateSchema('\Fisharebest\Webtrees\WebtreesSchema', 'WT_SCHEMA_VERSION', Webtrees::SCHEMA_VERSION);
+
+        $config = parse_ini_file('data/config.ini.php');
+
+        $connection = DriverManager::getConnection([
+            'wrapperClass' => Connection::class,
+            'dbname'       => $config['dbname'],
+            'user'         => $config['dbuser'],
+            'password'     => $config['dbpass'],
+            'host'         => $config['dbhost'],
+            'driver'       => 'pdo_' . $config['dbtype'],
+            'prefix'       => $config['tblpfx'],
+        ]);
+
+        WebtreesSchema::migrate($connection, 'wt_');
 
         return $handler->handle($request);
     }
