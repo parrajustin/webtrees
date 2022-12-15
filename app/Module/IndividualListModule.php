@@ -39,6 +39,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function app;
 use function array_filter;
+use function array_key_exists;
 use function array_keys;
 use function array_sum;
 use function assert;
@@ -183,8 +184,6 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      */
     protected function createResponse(Tree $tree, UserInterface $user, array $params, bool $families): ResponseInterface
     {
-        ob_start();
-
         // We show three different lists: initials, surnames and individuals
 
         // All surnames beginning with this letter, where "@" is unknown and "," is none
@@ -253,13 +252,10 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
             $show_all = false;
             if ($surname === Individual::NOMEN_NESCIO) {
                 $legend = I18N::translateContext('Unknown surname', '…');
-                if (count($all_surnames[$surname]) === 1) {
-                    //$show = 'indi'; // The surname list makes no sense with only one surname.
-                }
+                $show   = 'indi'; // The surname list makes no sense with only one surname.
             } else {
-                // The surname parameter is a root/canonical form.
-                // Display the actual surnames found.
-                $variants = array_keys($all_surnames[$surname]);
+                // The surname parameter is a root/canonical form. Display the actual surnames found.
+                $variants = array_keys($all_surnames[$surname] ?? [$surname => $surname]);
                 usort($variants, I18N::comparator());
                 $variants = array_map(static fn (string $x): string => $x === '' ? I18N::translate('No surname') : $x, $variants);
                 $legend   = implode('/', $variants);
@@ -305,6 +301,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
             $title = I18N::translate('Individuals') . ' — ' . $legend;
         }
 
+        ob_start();
         ?>
         <div class="d-flex flex-column wt-page-options wt-page-options-individual-list d-print-none">
             <ul class="d-flex flex-wrap list-unstyled justify-content-center wt-initials-list wt-initials-list-surname">
@@ -586,8 +583,8 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         }
 
         $query
-            ->select(new Expression('CAST(n_givn AS BINARY) AS n_givn'), new Expression('COUNT(*) AS count'))
-            ->groupBy([new Expression('CAST(n_givn AS BINARY)')]);
+            ->select($this->binaryColumn('n_givn', 'n_givn'), new Expression('COUNT(*) AS count'))
+            ->groupBy([$this->binaryColumn('n_givn')]);
 
         foreach ($query->get() as $row) {
             $initial = I18N::strtoupper(I18N::language()->initialLetter($row->n_givn));
@@ -619,8 +616,8 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         $query = DB::table('name')
             ->where('n_file', '=', $tree->id())
             ->select([
-                new Expression('CAST(n_surn AS BINARY) AS n_surn'),
-                new Expression('CAST(n_surname AS BINARY) AS n_surname'),
+                $this->binaryColumn('n_surn', 'n_surn'),
+                $this->binaryColumn('n_surname', 'n_surname'),
                 new Expression('COUNT(*) AS total'),
             ]);
 
@@ -628,8 +625,8 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         $this->whereMarriedName($marnm, $query);
 
         $query->groupBy([
-            new Expression('CAST(n_surn AS BINARY)'),
-            new Expression('CAST(n_surname AS BINARY)'),
+            $this->binaryColumn('n_surn'),
+            $this->binaryColumn('n_surname'),
         ]);
 
         /** @var array<array<int>> $list */
@@ -722,7 +719,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         $this->whereMarriedName($marnm, $query);
 
         if ($surnames !== []) {
-            $query->whereIn(new Expression('CAST(n_surname AS binary)'), $surnames);
+            $query->whereIn($this->binaryColumn('n_surname'), $surnames);
         }
 
         $query
@@ -781,5 +778,29 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         }
 
         return $families->unique();
+    }
+
+    /**
+     * This module assumes the database will use binary collation on the name columns.
+     * Until we convert MySQL databases to use utf8_bin, we need to do this at run-time.
+     *
+     * @param string      $column
+     * @param string|null $alias
+     *
+     * @return Expression
+     */
+    private function binaryColumn(string $column, string $alias = null): Expression
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $sql = 'CAST(' . $column . ' AS binary)';
+        } else {
+            $sql = $column;
+        }
+
+        if ($alias !== null) {
+            $sql .= ' AS ' . $alias;
+        }
+
+        return new Expression($sql);
     }
 }
