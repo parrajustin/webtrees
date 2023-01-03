@@ -20,40 +20,26 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\DB;
 
 use DomainException;
-use Fisharebest\Webtrees\DB\Drivers\DriverInterface;
 use Fisharebest\Webtrees\DB\Drivers\Table;
 use Fisharebest\Webtrees\DB\Drivers\MySQLDriver;
 use Fisharebest\Webtrees\DB\Drivers\PostgreSQLDriver;
 use Fisharebest\Webtrees\DB\Drivers\SQLiteDriver;
 use Fisharebest\Webtrees\DB\Drivers\SQLServerDriver;
 use PDO;
+use Stringable;
 use UnhandledMatchError;
 
 /**
  * Extend the PDO database connection to support prefixes and introspection.
  */
-class Connection
+class Expression implements Stringable
 {
-    private DriverInterface $driver;
-
-    public function __construct(private readonly PDO $pdo, private readonly string $prefix = '')
+    public function __construct(private readonly string $sql)
     {
-        $driver_name = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-
-        try {
-            $this->driver = match ($driver_name) {
-                'mysql'    => new MySQLDriver($pdo, $prefix),
-                'sqlite'   => new SQLiteDriver($pdo, $prefix),
-                'sqlsrv'   => new SQLServerDriver($pdo, $prefix),
-                'postgres' => new PostgreSQLDriver($pdo, $prefix),
-            };
-        } catch (UnhandledMatchError) {
-            throw new DomainException('No driver available for ' . $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-        }
     }
 
-    public function introspectSchema(): Schema
+    public function __toString()
     {
-        return $this->driver->introspectSchema('webtrees');
+        return $this->sql;
     }
 }

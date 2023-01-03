@@ -24,12 +24,14 @@ use Fisharebest\Webtrees\DB\Connection;
 use Fisharebest\Webtrees\DB\WebtreesSchema;
 use Fisharebest\Webtrees\Services\MigrationService;
 use Fisharebest\Webtrees\Webtrees;
+use PDO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function parse_ini_file;
+use function var_dump;
 
 /**
  * Middleware to update the database automatically, after an upgrade.
@@ -61,8 +63,18 @@ class UpdateDatabaseSchema implements MiddlewareInterface
 
         $config = parse_ini_file('data/config.ini.php');
 
+        $pdo = new PDO('mysql:dbname=webtrees;host=localhost', $config['dbuser'], $config['dbpass']);
+
+        $connection = new \Fisharebest\Webtrees\DB\Connection($pdo, $config['tblpfx']);
+
+        var_dump($connection->introspectSchema('webtrees'));exit;
+
+
+
+
+
         $connection = DriverManager::getConnection([
-            'wrapperClass' => Connection::class,
+            //'wrapperClass' => Connection::class,
             'dbname'       => $config['dbname'],
             'user'         => $config['dbuser'],
             'password'     => $config['dbpass'],
@@ -71,7 +83,7 @@ class UpdateDatabaseSchema implements MiddlewareInterface
             'prefix'       => $config['tblpfx'],
         ]);
 
-        WebtreesSchema::migrate($connection, 'wt_');
+        //WebtreesSchema::migrate($connection, 'wt_');
 
         return $handler->handle($request);
     }

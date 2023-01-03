@@ -17,27 +17,18 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\DB;
+namespace Fisharebest\Webtrees\DB\Schema;
 
-use Doctrine\DBAL\Schema\Schema as BaseSchema;
-use Doctrine\DBAL\Schema\Table;
-
-/**
- * Extend the Doctrine/DBAL schema.
- */
-class Schema extends BaseSchema
+class Table
 {
-    public function __construct(
-        private readonly string $prefix
-    ) {
-        parent::__construct();
+    public function __construct(private readonly string $name, private array $columns = [])
+    {
     }
 
-    public function createTable(string $name): Table
+    public function addColumn(Column $column): self
     {
-        $table = parent::createTable($this->prefix . $name);
-        $table->addOption('collation', 'utf8mb4_bin');
+        $this->columns[] = $column;
 
-        return $table;
+        return $this;
     }
 }

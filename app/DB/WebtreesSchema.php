@@ -26,6 +26,8 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Exception;
 
+use function var_dump;
+
 /**
  * Definitions for the webtrees database.
  */
