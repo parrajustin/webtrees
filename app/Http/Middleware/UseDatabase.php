@@ -98,6 +98,8 @@ class UseDatabase implements MiddlewareInterface
             'collation' => $collation,
             'timezone' => '+00:00',
             'engine' => 'InnoDB',
+            'sslmode' => 'verify-ca',
+            'sslrootcert' => '/var/postgresql/root.crt',
             'modes' => [
                 'ANSI',
                 'STRICT_ALL_TABLES',
