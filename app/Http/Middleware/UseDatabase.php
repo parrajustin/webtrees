@@ -56,47 +56,49 @@ class UseDatabase implements MiddlewareInterface
 
         // Newer versions of webtrees support utf8mb4.  Older ones only support 3-byte utf8
         if ($driver === 'mysql' && Validator::attributes($request)->boolean('mysql_utf8mb4', false)) {
-            $charset   = 'utf8mb4';
+            $charset = 'utf8mb4';
             $collation = 'utf8mb4_unicode_ci';
         } else {
-            $charset   = 'utf8';
+            $charset = 'utf8';
             $collation = 'utf8_unicode_ci';
         }
 
         $options = [
-            // Some drivers do this and some don't.  Make them consistent.
+                // Some drivers do this and some don't.  Make them consistent.
             PDO::ATTR_STRINGIFY_FETCHES => true,
+            // For postgresql root cert for cockroach encryption.
+            'sslrootcert' => '/var/postgresql/root.crt'
         ];
 
-        $dbkey    = Validator::attributes($request)->string('dbkey', '');
-        $dbcert   = Validator::attributes($request)->string('dbcert', '');
-        $dbca     = Validator::attributes($request)->string('dbca', '');
+        $dbkey = Validator::attributes($request)->string('dbkey', '');
+        $dbcert = Validator::attributes($request)->string('dbcert', '');
+        $dbca = Validator::attributes($request)->string('dbca', '');
         $dbverify = Validator::attributes($request)->boolean('dbverify', false);
 
         // MySQL/MariaDB support encrypted connections
         if ($dbkey !== '' && $dbcert !== '' && $dbca !== '') {
             $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $dbverify;
-            $options[PDO::MYSQL_ATTR_SSL_KEY]                = Webtrees::ROOT_DIR . 'data/' . $dbkey;
-            $options[PDO::MYSQL_ATTR_SSL_CERT]               = Webtrees::ROOT_DIR . 'data/' . $dbcert;
-            $options[PDO::MYSQL_ATTR_SSL_CA]                 = Webtrees::ROOT_DIR . 'data/' . $dbca;
+            $options[PDO::MYSQL_ATTR_SSL_KEY] = Webtrees::ROOT_DIR . 'data/' . $dbkey;
+            $options[PDO::MYSQL_ATTR_SSL_CERT] = Webtrees::ROOT_DIR . 'data/' . $dbcert;
+            $options[PDO::MYSQL_ATTR_SSL_CA] = Webtrees::ROOT_DIR . 'data/' . $dbca;
         }
 
         $capsule->addConnection([
-            'driver'                  => $driver,
-            'host'                    => Validator::attributes($request)->string('dbhost'),
-            'port'                    => Validator::attributes($request)->string('dbport'),
-            'database'                => $dbname,
-            'username'                => Validator::attributes($request)->string('dbuser'),
-            'password'                => Validator::attributes($request)->string('dbpass'),
-            'prefix'                  => Validator::attributes($request)->string('tblpfx'),
-            'prefix_indexes'          => true,
-            'options'                 => $options,
+            'driver' => $driver,
+            'host' => Validator::attributes($request)->string('dbhost'),
+            'port' => Validator::attributes($request)->string('dbport'),
+            'database' => $dbname,
+            'username' => Validator::attributes($request)->string('dbuser'),
+            'password' => Validator::attributes($request)->string('dbpass'),
+            'prefix' => Validator::attributes($request)->string('tblpfx'),
+            'prefix_indexes' => true,
+            'options' => $options,
             // For MySQL
-            'charset'                 => $charset,
-            'collation'               => $collation,
-            'timezone'                => '+00:00',
-            'engine'                  => 'InnoDB',
-            'modes'                   => [
+            'charset' => $charset,
+            'collation' => $collation,
+            'timezone' => '+00:00',
+            'engine' => 'InnoDB',
+            'modes' => [
                 'ANSI',
                 'STRICT_ALL_TABLES',
                 // Use SQL injection(!) to override MAX_JOIN_SIZE and GROUP_CONCAT_MAX_LEN settings.
