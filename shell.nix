@@ -2,6 +2,7 @@
   pkgs.mkShell {
     # nativeBuildInputs is usually what you want -- tools you need to run
     nativeBuildInputs = [ 
+      pkgs.zip
       pkgs.php
       pkgs.php81Packages.composer
       pkgs.nodejs-16_x
