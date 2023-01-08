@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53e1c3467b5114a7b75bd8a826d4a7d1",
+    "content-hash": "c7774ed2f13980bf390c301516bbc70a",
     "packages": [
         {
             "name": "aura/router",
@@ -3912,6 +3912,65 @@
             "time": "2021-11-04T06:37:27+00:00"
         },
         {
+            "name": "spatie/laravel-package-tools",
+            "version": "1.12.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-package-tools.git",
+                "reference": "09f80fa240d44fafb1c70657c74ee44ffa929357"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/09f80fa240d44fafb1c70657c74ee44ffa929357",
+                "reference": "09f80fa240d44fafb1c70657c74ee44ffa929357",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^7.0|^8.0|^9.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^5.0|^6.23|^7.0",
+                "phpunit/phpunit": "^9.4",
+                "spatie/test-time": "^1.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\LaravelPackageTools\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Tools for creating Laravel packages",
+            "homepage": "https://github.com/spatie/laravel-package-tools",
+            "keywords": [
+                "laravel-package-tools",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-package-tools/issues",
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.12.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-06-28T14:29:26+00:00"
+        },
+        {
             "name": "symfony/cache",
             "version": "v5.4.15",
             "source": {
@@ -5987,6 +6046,83 @@
                 }
             ],
             "time": "2022-01-24T18:55:24+00:00"
+        },
+        {
+            "name": "ylsideas/cockroachdb-laravel",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ylsideas/cockroachdb-laravel.git",
+                "reference": "98eaa34e337f4753105e860b8c81cb3dad4e3636"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ylsideas/cockroachdb-laravel/zipball/98eaa34e337f4753105e860b8c81cb3dad4e3636",
+                "reference": "98eaa34e337f4753105e860b8c81cb3dad4e3636",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "9.*|8.*",
+                "php": "^8.0",
+                "spatie/laravel-package-tools": "^1.9.2"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^3.2",
+                "laravel/pint": "^1.2",
+                "nunomaduro/collision": "^6.0|^5.10",
+                "nunomaduro/larastan": "^1.0",
+                "orchestra/testbench": "^7.0|^6.24",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "rector/rector": "^0.14.2",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "YlsIdeas\\CockroachDb\\CockroachDbServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "YlsIdeas\\CockroachDb\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Peter Fox",
+                    "email": "peter.fox@ylsideas.co",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is my package cockroachdb-laravel",
+            "homepage": "https://github.com/ylsideas/cockroachdb-laravel",
+            "keywords": [
+                "cockroachdb-laravel",
+                "laravel",
+                "ylsideas"
+            ],
+            "support": {
+                "issues": "https://github.com/ylsideas/cockroachdb-laravel/issues",
+                "source": "https://github.com/ylsideas/cockroachdb-laravel/tree/v1.1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/peterfox",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-10-05T21:27:04+00:00"
         }
     ],
     "packages-dev": [
@@ -9212,7 +9348,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "7.4 - 8.2",
+        "php": "8.1 - 8.2",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-exif": "*",
@@ -9235,7 +9371,7 @@
         "ext-sqlite3": "*"
     },
     "platform-overrides": {
-        "php": "7.4"
+        "php": "8.1"
     },
     "plugin-api-version": "2.3.0"
 }

@@ -84,7 +84,7 @@ class UseDatabase implements MiddlewareInterface
         }
 
         $capsule->addConnection([
-            'driver' => $driver,
+            'driver' => 'crdb',
             'host' => Validator::attributes($request)->string('dbhost'),
             'port' => Validator::attributes($request)->string('dbport'),
             'database' => $dbname,
@@ -98,8 +98,10 @@ class UseDatabase implements MiddlewareInterface
             'collation' => $collation,
             'timezone' => '+00:00',
             'engine' => 'InnoDB',
-            'sslmode' => 'verify-ca',
+            'sslmode' => env('COCKROACHDB_SSLMODE', 'verify-full'),
             'sslrootcert' => '/var/postgresql/root.crt',
+            'cluster' => env('COCKROACHDB_CLUSTER', ''),
+            'schema' => 'public',
             'modes' => [
                 'ANSI',
                 'STRICT_ALL_TABLES',
